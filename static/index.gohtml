@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RPiDraw</title>
+    <style>
+        html {
+            background: black
+        }
+        table, td, th {
+            border: 1px solid white;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        td {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    
+<table id="matrix">
+</table>
+<script type="text/javascript">
+    const socket = new WebSocket("ws://{{.}}:8080/api/canvas");
+
+    let elm
+
+    socket.onmessage = function (e) {
+        const data = JSON.parse(e.data)
+        console.log(`Received new canvas: ${data}`)
+        let mt = document.getElementById("matrix")
+        while (mt.lastElementChild) {
+            mt.removeChild(myNode.lastElementChild);
+        }
+
+        for ( let i = 0; i < data.canvas.length; i++ ) {
+            let line = data.canvas[i]
+            let tr = document.createElement("tr")
+            for (let j = 0; j < line.length; j++) {
+                let cell = line[j]
+                let td = document.createElement("td")
+                td.style.background = "#" + cell.toString(16)
+                tr.appendChild(td)
+            }
+            mt.appendChild(tr)
+        }
+        // if (elm !== undefined) {
+        //     elm.style.background = "white"
+        // }
+        //
+        // let id = `${data.y}${data.x}`
+        // elm = document.getElementById(id)
+        // elm.style.background = data.color
+    };
+</script>
+</body>
+</html>

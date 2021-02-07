@@ -24,8 +24,8 @@ func TestMoveUpWindowMidleCursorMidle(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: centerX, Y: centerY, Color: 45},
-		Window:      c.prepareWindow(windowSize, windowSize),
+		Cursor: &Cursor{X: centerX, Y: centerY, Color: 45},
+		Window: c.prepareWindow(windowSize, windowSize),
 	}
 
 	b.MoveUp()
@@ -42,8 +42,8 @@ func TestMoveUpWindowMidleCursorTop(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: centerX, Y: centerY, Color: 45},
-		Window:      c.prepareWindow(windowSize, centerY),
+		Cursor: &Cursor{X: centerX, Y: centerY, Color: 45},
+		Window: c.prepareWindow(windowSize, centerY),
 	}
 
 	b.MoveUp()
@@ -60,8 +60,8 @@ func TestMoveUpWindowTopCursorMidle(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: centerX, Y: 3, Color: 45},
-		Window:      c.prepareWindow(centerX, 0),
+		Cursor: &Cursor{X: centerX, Y: 3, Color: 45},
+		Window: c.prepareWindow(centerX, 0),
 	}
 
 	b.MoveUp()
@@ -78,8 +78,8 @@ func TestMoveUpWindowTopCursorTop(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: centerX, Y: 0, Color: 45},
-		Window:      c.prepareWindow(windowSize, 0),
+		Cursor: &Cursor{X: centerX, Y: 0, Color: 45},
+		Window: c.prepareWindow(windowSize, 0),
 	}
 
 	b.MoveUp()
@@ -96,8 +96,8 @@ func TestMoveDownWindowMidleCursorMidle(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: centerX, Y: centerY, Color: 45},
-		Window:      c.prepareWindow(windowSize, windowSize),
+		Cursor: &Cursor{X: centerX, Y: centerY, Color: 45},
+		Window: c.prepareWindow(windowSize, windowSize),
 	}
 
 	b.MoveDown()
@@ -158,8 +158,8 @@ func TestMoveDownWindowTopCursorBottom(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: centerX, Y: canvasHight - 1, Color: 45},
-		Window:      c.prepareWindow(windowSize, canvasHight-windowSize),
+		Cursor: &Cursor{X: centerX, Y: canvasHight - 1, Color: 45},
+		Window: c.prepareWindow(windowSize, canvasHight-windowSize),
 	}
 
 	b.MoveDown()
@@ -176,8 +176,8 @@ func TestMoveLeftWindowMidleCursorMidle(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: centerX, Y: centerY, Color: 45},
-		Window:      c.prepareWindow(windowSize, windowSize),
+		Cursor: &Cursor{X: centerX, Y: centerY, Color: 45},
+		Window: c.prepareWindow(windowSize, windowSize),
 	}
 
 	b.MoveLeft()
@@ -194,8 +194,8 @@ func TestMoveLeftWindowMidleCursorLeft(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: windowSize, Y: centerY, Color: 45},
-		Window:      c.prepareWindow(windowSize, windowSize),
+		Cursor: &Cursor{X: windowSize, Y: centerY, Color: 45},
+		Window: c.prepareWindow(windowSize, windowSize),
 	}
 
 	b.MoveLeft()
@@ -212,8 +212,8 @@ func TestMoveLeftWindowLeftCursorMidle(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: 3, Y: centerY, Color: 45},
-		Window:      c.prepareWindow(0, centerY),
+		Cursor: &Cursor{X: 3, Y: centerY, Color: 45},
+		Window: c.prepareWindow(0, centerY),
 	}
 
 	b.MoveLeft()
@@ -230,8 +230,8 @@ func TestMoveLeftWindowLeftCursorLeft(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: 0, Y: centerY, Color: 45},
-		Window:      c.prepareWindow(0, centerY),
+		Cursor: &Cursor{X: 0, Y: centerY, Color: 45},
+		Window: c.prepareWindow(0, centerY),
 	}
 
 	b.MoveLeft()
@@ -248,8 +248,8 @@ func TestMoveRightWindowMidleCursorMidle(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: centerX, Y: centerY, Color: 45},
-		Window:      c.prepareWindow(windowSize, windowSize),
+		Cursor: &Cursor{X: centerX, Y: centerY, Color: 45},
+		Window: c.prepareWindow(windowSize, windowSize),
 	}
 
 	b.MoveRight()
@@ -310,8 +310,8 @@ func TestMoveRightWindowRightCursorRight(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: canvasWidth - 1, Y: centerY, Color: 45},
-		Window:      c.prepareWindow(canvasWidth-windowSize, centerY),
+		Cursor: &Cursor{X: canvasWidth - 1, Y: centerY, Color: 45},
+		Window: c.prepareWindow(canvasWidth-windowSize, centerY),
 	}
 
 	b.MoveRight()
@@ -328,8 +328,8 @@ func TestBoardSet(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: windowSize + 1, Y: windowSize - 1, Color: 45},
-		Window:      c.prepareWindow(windowSize, windowSize),
+		Cursor: &Cursor{X: windowSize + 1, Y: windowSize - 1, Color: 45},
+		Window: c.prepareWindow(windowSize, windowSize),
 	}
 
 	b.DrawPixel()
@@ -343,8 +343,8 @@ func TestBoardDelete(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: windowSize + 1, Y: windowSize - 1, Color: 45},
-		Window:      c.prepareWindow(windowSize, windowSize),
+		Cursor: &Cursor{X: windowSize + 1, Y: windowSize - 1, Color: 45},
+		Window: c.prepareWindow(windowSize, windowSize),
 	}
 
 	b.DeletePixel()
@@ -358,8 +358,8 @@ func TestResetBoard(t *testing.T) {
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor:     &Cursor{X: 0, Y: 0, Color: 45},
-		Window:      c.prepareWindow(0, 0),
+		Cursor: &Cursor{X: 0, Y: 0, Color: 45},
+		Window: c.prepareWindow(0, 0),
 	}
 	b.Reset()
 
@@ -379,8 +379,8 @@ func TestResetBoard(t *testing.T) {
 		t.Errorf("b.Cursor.Y should be %d but it's %d", centerY, b.Cursor.Y)
 	}
 
-	if b.Cursor.Color != 0xFFFF {
-		t.Errorf("b.Cursor.Color should be %d but it's %d", 0, b.Cursor.Color)
+	if b.Cursor.Color != 0xFFFFFF {
+		t.Errorf("b.Cursor.Color should be %d but it's %d", 0xFFFFFF, b.Cursor.Color)
 	}
 
 	if b.Window.X != windowSize {

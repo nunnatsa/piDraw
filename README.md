@@ -5,6 +5,10 @@ This software should run on a raspberry pi with a hat. It uses the hat to draw: 
 
 The software also starts a web application that serves a HTML page to display the full draw.
 
+![Sense HAT](images/pi-hat.jpeg | width=250)
+
+![webapp](images/weapp.png | width=300)
+
 ## How to Build and Run
 I checked this on raspberry pi 2B with a [Sense HAT](https://www.raspberrypi.org/products/sense-hat/), with golang version 1.15.8
 

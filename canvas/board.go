@@ -2,11 +2,12 @@ package canvas
 
 import (
 	"encoding/json"
-	"github.com/gorilla/websocket"
-	"github.com/nunnatsa/piDraw/datatype"
 	"log"
 	"net/http"
 	"sync"
+
+	"github.com/gorilla/websocket"
+	"github.com/nunnatsa/piDraw/datatype"
 )
 
 var (
@@ -18,12 +19,13 @@ var (
 
 // Board is the draing board.
 type Board struct {
-	Canvas *Canvas `json:"canvas,omitempty"`
-	Cursor *Cursor `json:"cursor,omitempty"`
-	Window *Window `json:"window,omitempty"`
-	reg    *Notifier
-	events <-chan datatype.HatEvent
-	screen chan<- *datatype.DisplayMessage
+	Canvas       *Canvas `json:"canvas,omitempty"`
+	Cursor       *Cursor `json:"cursor,omitempty"`
+	Window       *Window `json:"window,omitempty"`
+	reg          *Notifier
+	hatEvents    <-chan datatype.HatEvent
+	clientEvents chan string
+	screen       chan<- *datatype.DisplayMessage
 }
 
 // NewBoard initiate a new Board
@@ -41,8 +43,9 @@ func NewBoard(events <-chan datatype.HatEvent, screen chan<- *datatype.DisplayMe
 			clientMap: make(map[int64]chan []byte),
 			idp:       &idProvider{lock: &sync.Mutex{}},
 		},
-		events: events,
-		screen: screen,
+		hatEvents:    events,
+		clientEvents: make(chan string),
+		screen:       screen,
 	}
 
 	go b.do()
@@ -50,22 +53,43 @@ func NewBoard(events <-chan datatype.HatEvent, screen chan<- *datatype.DisplayMe
 	return b
 }
 
-func (b *Board) do () {
-	for event := range b.events {
-		switch event {
-		case datatype.Pressed:
-			b.DrawPixel()
-		case datatype.MoveUp:
-			b.MoveUp()
-		case datatype.MoveDown:
-			b.MoveDown()
-		case datatype.MoveLeft:
-			b.MoveLeft()
-		case datatype.MoveRight:
-			b.MoveRight()
+func (b *Board) do() {
+	for {
+		changed := false
+		select {
+		case event := <-b.hatEvents:
+			switch event {
+			case datatype.Pressed:
+				log.Println("HAT Event: Pressed")
+				b.DrawPixel()
+				changed = true
+			case datatype.MoveUp:
+				log.Println("HAT Event: MoveUp")
+				b.MoveUp()
+				changed = true
+			case datatype.MoveDown:
+				log.Println("HAT Event: MoveDown")
+				b.MoveDown()
+				changed = true
+			case datatype.MoveLeft:
+				log.Println("HAT Event: MoveLeft")
+				b.MoveLeft()
+				changed = true
+			case datatype.MoveRight:
+				log.Println("HAT Event: MoveRight")
+				b.MoveRight()
+				changed = true
+			}
+		case event := <-b.clientEvents:
+			switch event {
+			case "reset":
+				b.Reset()
+				changed = true
+			}
 		}
-
-		b.Update()
+		if changed {
+			b.Update()
+		}
 	}
 }
 
@@ -117,6 +141,7 @@ func (b *Board) DeletePixel() {
 
 // Reset return the board to the initiate state
 func (b *Board) Reset() {
+	log.Println("Reseting the canvas")
 	b.Canvas = newCanvas()
 	b.Cursor = &Cursor{
 		X:     centerX,
@@ -124,10 +149,11 @@ func (b *Board) Reset() {
 		Color: 0xFFFFFF,
 	}
 	b.Window = b.Canvas.prepareWindow(windowSize, windowSize)
+	log.Println("canvas is clean now")
 }
 
 func (b *Board) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
+	if r.URL.Path == "/" && r.Method == http.MethodGet {
 		conn, err := upgrader.Upgrade(w, r, nil) // error ignored for sake of simplicity
 		if err != nil {
 			log.Println("Error:", err)
@@ -135,9 +161,11 @@ func (b *Board) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			_, _ = w.Write([]byte(err.Error()))
 		}
 
-		ch := make(chan []byte)
+		defer conn.Close()
 
-		id := b.reg.Subscribe(ch)
+		subscription := make(chan []byte)
+
+		id := b.reg.Subscribe(subscription)
 		defer b.reg.Unsubscribe(id)
 
 		js, err := json.Marshal(b)
@@ -150,17 +178,23 @@ func (b *Board) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		for range ch {
+		for js := range subscription {
+			log.Printf("got event; updating the %d\n", id)
 			if err := conn.WriteMessage(websocket.TextMessage, js); err != nil {
-				log.Println(err)
+				log.Printf("failed to send message to the client %d: %v\n", id, err)
 				return
 			}
+		}
+		log.Println("Connection is closed")
+	} else {
+		if r.URL.Path == "/reset" && r.Method == http.MethodPost {
+			b.clientEvents <- "reset"
 		}
 	}
 }
 
 func (b *Board) Update() {
-	msg := datatype.NewDisplayMessage(b.Window.matrix, b.Cursor.X, b.Cursor.Y)
+	msg := datatype.NewDisplayMessage(b.Window.matrix, b.Cursor.X-b.Window.X, b.Cursor.Y-b.Window.Y)
 	b.screen <- msg
 
 	js, err := json.Marshal(b)

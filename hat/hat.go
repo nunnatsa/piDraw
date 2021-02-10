@@ -24,10 +24,10 @@ type Hat struct {
 	input  *stick.Device
 }
 
-func NewHat(events chan<- datatype.HatEvent, screen <-chan *datatype.DisplayMessage) *Hat {
+func NewHat(e chan<- datatype.HatEvent, s <-chan *datatype.DisplayMessage) *Hat {
 	h := &Hat{
-		events: events,
-		screen: screen,
+		events: e,
+		screen: s,
 	}
 
 	go h.do()
@@ -40,6 +40,7 @@ func (h *Hat) init() {
 	if err != nil {
 		log.Panic(err)
 	}
+	screen.Clear()
 }
 
 func (h *Hat) do() {
@@ -47,6 +48,7 @@ func (h *Hat) do() {
 	// Set up a signals channel (stop the loop using Ctrl-C)
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Interrupt, os.Kill)
+	defer log.Printf("HAT even handling crached")
 	for {
 		select {
 		case <-signals:
@@ -57,16 +59,23 @@ func (h *Hat) do() {
 			switch event.Code {
 			case stick.Enter:
 				h.events <- datatype.Pressed
+				log.Println("Joystick Event: Pressed")
 			case stick.Up:
 				h.events <- datatype.MoveUp
+				log.Println("Joystick Event: MoveUp")
 			case stick.Down:
 				h.events <- datatype.MoveDown
+				log.Println("Joystick Event: MoveDown")
 			case stick.Left:
 				h.events <- datatype.MoveLeft
+				log.Println("Joystick Event: MoveLeft")
 			case stick.Right:
 				h.events <- datatype.MoveRight
+				log.Println("Joystick Event: MoveRight")
 			}
 		case screenChange := <-h.screen:
+			//log.Println("HAT: got screen update:", screenChange)
+			
 			h.drawScreen(screenChange)
 		}
 	}
@@ -81,6 +90,7 @@ func (h *Hat) drawScreen(screenChange *datatype.DisplayMessage) {
 			fb.SetPixel(x, y, hatPixel)
 		}
 	}
+	fb.SetPixel(int(screenChange.CursorX), int(screenChange.CursorY), rmask)
 	err := screen.Draw(fb)
 	if err != nil {
 		log.Println("error while printing to HAT display:", err)

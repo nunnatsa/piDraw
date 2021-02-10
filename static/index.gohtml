@@ -25,17 +25,21 @@
     
 <table id="matrix">
 </table>
+<p>
+<button id="reset" value="Reset">Reset</button>
+</p>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript">
-    const socket = new WebSocket("ws://{{.}}:8080/api/canvas");
+    const socket = new WebSocket("ws://{{.}}:8080/api/canvas/");
 
     let elm
 
     socket.onmessage = function (e) {
         const data = JSON.parse(e.data)
-        console.log(`Received new canvas: ${data}`)
+        console.log(`Received new canvas: ${e.data}`)
         let mt = document.getElementById("matrix")
         while (mt.lastElementChild) {
-            mt.removeChild(myNode.lastElementChild);
+            mt.removeChild(mt.lastElementChild);
         }
 
         for ( let i = 0; i < data.canvas.length; i++ ) {
@@ -49,14 +53,12 @@
             }
             mt.appendChild(tr)
         }
-        // if (elm !== undefined) {
-        //     elm.style.background = "white"
-        // }
-        //
-        // let id = `${data.y}${data.x}`
-        // elm = document.getElementById(id)
-        // elm.style.background = data.color
     };
+
+    const reset = document.getElementById("reset")
+    reset.onclick = function(e) {
+        $.post("http://{{.}}:8080/api/canvas/reset", "reset")
+    }
 </script>
 </body>
 </html>

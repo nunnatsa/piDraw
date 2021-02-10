@@ -1,5 +1,7 @@
 package datatype
 
+import "fmt"
+
 const (
 	Pressed HatEvent = iota
 	MoveUp
@@ -16,12 +18,16 @@ type DisplayMessage struct {
 	CursorY uint8
 }
 
-func NewDisplayMessage(mat [][]Color, x, y uint8) *DisplayMessage{
+func NewDisplayMessage(mat [][]Color, x, y uint8) *DisplayMessage {
 	return &DisplayMessage{
-		Screen: mat,
+		Screen:  mat,
 		CursorX: x,
 		CursorY: y,
 	}
+}
+
+func (dm DisplayMessage) String() string {
+	return fmt.Sprintf("screen: %v\ncursor: (%d, %d)", dm.Screen, dm.CursorX, dm.CursorY)
 }
 
 // Color is the Color of one pixel in the Canvas

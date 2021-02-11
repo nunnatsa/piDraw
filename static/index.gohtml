@@ -74,6 +74,27 @@
                 let td = document.createElement("td")
                 td.id = getCelId(j, i)
                 td.style.backgroundColor = "#" + cell.toString(16).padStart(6, '0')
+
+                if (i === data.window.y) {
+                    if (j >= data.window.x && j <= data.window.x + 7) {
+                        td.style.borderTopWidth="3px"
+                    }
+                } else if (i === data.window.y + 7) {
+                    if (j >= data.window.x && j <= data.window.x + 7) {
+                        td.style.borderBottomWidth = "3px"
+                    }
+                }
+
+                if (j === data.window.x) {
+                    if (i >= data.window.y && i <= data.window.y + 7) {
+                        td.style.borderLeftWidth="3px"
+                    }
+                } else if (j === data.window.x + 7) {
+                    if (i >= data.window.y && i <= data.window.y + 7) {
+                        td.style.borderRightWidth = "3px"
+                    }
+                }
+
                 tr.appendChild(td)
             }
             mt.appendChild(tr)

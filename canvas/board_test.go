@@ -397,7 +397,7 @@ func TestResetBoard(t *testing.T) {
 
 func TestDo(t *testing.T) {
 	hatEvents := make(chan datatype.HatEvent)
-	clientEvents := make(chan string)
+	clientEvents := make(chan clientEvent)
 	screenEvents := make(chan *datatype.DisplayMessage)
 
 	c := getTestCanvas()
@@ -474,12 +474,12 @@ func TestDo(t *testing.T) {
 		t.Errorf("canvas[%d][%d] should be 45 but it's %d", windowSize+4, windowSize+4, (*b.Canvas)[windowSize+4][windowSize+4])
 	}
 
-	clientEvents <- "not_supported"
+	clientEvents <- clientEvent{eventType: clientEventType(0xFFFF)}
 	if len(screenEvents) > 0 {
 		t.Errorf("Should do nothing, but produced screen event %v", <-screenEvents)
 	}
 
-	clientEvents <- "reset"
+	clientEvents <- clientEvent{eventType: eventTypeReset}
 	msg = <-screenEvents
 	if msg.CursorX != 4 {
 		t.Errorf("msg.CursorX should be 4 but it's %d", msg.CursorX)

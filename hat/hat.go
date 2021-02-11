@@ -12,11 +12,25 @@ import (
 	"github.com/nunnatsa/piDraw/datatype"
 )
 
+// The format of the HAT color is 16-bit: 5 MS bits are the red color, the middle 6 bits are
+// green and the 5 LB bits are blue
+// rrrrrggggggbbbbb
 const (
-	rmask color.Color = 0b1111100000000000
-	gmask color.Color = 0b0000011111100000
-	bmask color.Color = 0b0000000000011111
+	redColor color.Color    = 0b1111100000000000
+	rmask    datatype.Color = 0b111110000000000000000000
+	gmask    datatype.Color = 0b000000001111110000000000
+	bmask    datatype.Color = 0b000000000000000011111000
 )
+
+// to convert 24-bit color to 16-bit color, we are taking only the 5 (for red and
+// blue) or 6 (for green) MS bits
+func toHatColor(c datatype.Color) color.Color {
+	r := color.Color((c & rmask) >> 8)
+	g := color.Color((c & gmask) >> 5)
+	b := color.Color((c & bmask) >> 3)
+
+	return r | g | b
+}
 
 type Hat struct {
 	events chan<- datatype.HatEvent
@@ -90,17 +104,9 @@ func (h *Hat) drawScreen(screenChange *datatype.DisplayMessage) {
 			fb.SetPixel(x, y, hatPixel)
 		}
 	}
-	fb.SetPixel(int(screenChange.CursorX), int(screenChange.CursorY), rmask)
+	fb.SetPixel(int(screenChange.CursorX), int(screenChange.CursorY), redColor)
 	err := screen.Draw(fb)
 	if err != nil {
 		log.Println("error while printing to HAT display:", err)
 	}
-}
-
-func toHatColor(c datatype.Color) color.Color {
-	r := color.Color(c>>8) & rmask
-	g := color.Color(c>>3) & gmask
-	b := color.Color(c) & bmask
-
-	return r | g | b
 }

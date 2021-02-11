@@ -75,7 +75,7 @@ func (h *Hat) do() {
 			}
 		case screenChange := <-h.screen:
 			//log.Println("HAT: got screen update:", screenChange)
-			
+
 			h.drawScreen(screenChange)
 		}
 	}

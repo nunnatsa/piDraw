@@ -4,8 +4,8 @@ import "github.com/nunnatsa/piDraw/datatype"
 
 // Cursor is the location of the current pixel
 type Cursor struct {
-	X     uint8 `json:"X,omitempty"`
-	Y     uint8 `json:"Y,omitempty"`
+	X     uint8          `json:"X,omitempty"`
+	Y     uint8          `json:"Y,omitempty"`
 	Color datatype.Color `json:"color,omitempty"`
 }
 

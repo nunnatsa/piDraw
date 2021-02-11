@@ -2,12 +2,10 @@ package canvas
 
 import (
 	"encoding/json"
-	"log"
-	"net/http"
-	"sync"
-
 	"github.com/gorilla/websocket"
 	"github.com/nunnatsa/piDraw/datatype"
+	"log"
+	"net/http"
 )
 
 var (
@@ -38,11 +36,8 @@ func NewBoard(events <-chan datatype.HatEvent, screen chan<- *datatype.DisplayMe
 			Y:     centerY,
 			Color: 0xFFFFFF,
 		},
-		Window: c.prepareWindow(windowSize, windowSize),
-		reg: &Notifier{
-			clientMap: make(map[int64]chan []byte),
-			idp:       &idProvider{lock: &sync.Mutex{}},
-		},
+		Window:       c.prepareWindow(windowSize, windowSize),
+		reg:          newNotifier(),
 		hatEvents:    events,
 		clientEvents: make(chan string),
 		screen:       screen,

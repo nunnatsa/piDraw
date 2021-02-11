@@ -14,7 +14,7 @@ func init() {
 	if err != nil {
 		log.Panic(err)
 	}
-	f, err := os.OpenFile("static/index.html", os.O_CREATE | os.O_RDWR | os.O_TRUNC, 0664)
+	f, err := os.OpenFile("static/index.html", os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0664)
 	if err != nil {
 		log.Panic(err)
 	}

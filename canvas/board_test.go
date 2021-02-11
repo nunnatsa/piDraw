@@ -1,6 +1,9 @@
 package canvas
 
-import "testing"
+import (
+	"github.com/nunnatsa/piDraw/datatype"
+	"testing"
+)
 
 func TestNewBoard(t *testing.T) {
 	b := NewBoard(nil, nil)
@@ -389,5 +392,111 @@ func TestResetBoard(t *testing.T) {
 
 	if b.Window.Y != windowSize {
 		t.Errorf("b.Window.Y should be %d but it's %d", windowSize, b.Window.Y)
+	}
+}
+
+func TestDo(t *testing.T) {
+	hatEvents := make(chan datatype.HatEvent)
+	clientEvents := make(chan string)
+	screenEvents := make(chan *datatype.DisplayMessage)
+
+	c := getTestCanvas()
+	b := &Board{
+		Canvas:       c,
+		Cursor:       &Cursor{X: windowSize + 4, Y: windowSize + 4, Color: 45},
+		Window:       c.prepareWindow(windowSize, windowSize),
+		hatEvents:    hatEvents,
+		clientEvents: clientEvents,
+		screen:       screenEvents,
+		reg:          newNotifier(),
+	}
+
+	go b.do()
+
+	hatEvents <- datatype.MoveDown
+	msg := <-screenEvents
+	if msg.CursorY != 5 {
+		t.Errorf("msg.CursorY should be 5 but it's %d", msg.CursorY)
+	}
+	if b.Cursor.Y != windowSize+5 {
+		t.Errorf("b.Cursor.Y should be %d but it's %d", windowSize+5, b.Cursor.Y)
+	}
+
+	hatEvents <- datatype.MoveUp
+	msg = <-screenEvents
+	if msg.CursorY != 4 {
+		t.Errorf("msg.CursorY should be 4 but it's %d", msg.CursorY)
+	}
+	if b.Cursor.Y != windowSize+4 {
+		t.Errorf("b.Cursor.Y should be %d but it's %d", windowSize+4, b.Cursor.Y)
+	}
+
+	hatEvents <- datatype.MoveRight
+	msg = <-screenEvents
+	if msg.CursorX != 5 {
+		t.Errorf("msg.CursorX should be 5 but it's %d", msg.CursorX)
+	}
+	if b.Cursor.X != windowSize+5 {
+		t.Errorf("b.Cursor.X should be %d but it's %d", windowSize+5, b.Cursor.X)
+	}
+
+	hatEvents <- datatype.MoveLeft
+	msg = <-screenEvents
+	if msg.CursorX != 4 {
+		t.Errorf("msg.CursorX should be 4 but it's %d", msg.CursorX)
+	}
+	if b.Cursor.X != windowSize+4 {
+		t.Errorf("b.Cursor.X should be %d but it's %d", windowSize+4, b.Cursor.X)
+	}
+
+	// make sure the original value is there, before changing
+	if (*b.Canvas)[windowSize+4][windowSize+4] != 13 {
+		t.Errorf("canvas[%d][%d] should be 13 but it's %d", windowSize+4, windowSize+4, (*b.Canvas)[windowSize+4][windowSize+4])
+	}
+	hatEvents <- datatype.Pressed
+	msg = <-screenEvents
+	if msg.CursorX != 4 {
+		t.Errorf("msg.CursorX should be 4 but it's %d", msg.CursorX)
+	}
+	if msg.CursorY != 4 {
+		t.Errorf("msg.CursorY should be 4 but it's %d", msg.CursorY)
+	}
+	if msg.Screen[4][4] != 45 {
+		t.Errorf("msg.Screen[4][4] should be 45 but it's %d", msg.Screen[4][4])
+	}
+	if b.Cursor.X != windowSize+4 {
+		t.Errorf("b.Cursor.X should be %d but it's %d", windowSize+4, b.Cursor.X)
+	}
+	if b.Cursor.Y != windowSize+4 {
+		t.Errorf("b.Cursor.Y should be %d but it's %d", windowSize+4, b.Cursor.Y)
+	}
+	if (*b.Canvas)[windowSize+4][windowSize+4] != 45 {
+		t.Errorf("canvas[%d][%d] should be 45 but it's %d", windowSize+4, windowSize+4, (*b.Canvas)[windowSize+4][windowSize+4])
+	}
+
+	clientEvents <- "not_supported"
+	if len(screenEvents) > 0 {
+		t.Errorf("Should do nothing, but produced screen event %v", <-screenEvents)
+	}
+
+	clientEvents <- "reset"
+	msg = <-screenEvents
+	if msg.CursorX != 4 {
+		t.Errorf("msg.CursorX should be 4 but it's %d", msg.CursorX)
+	}
+	if msg.CursorY != 4 {
+		t.Errorf("msg.CursorY should be 4 but it's %d", msg.CursorY)
+	}
+	if msg.Screen[4][4] != 0 {
+		t.Errorf("msg.Screen[4][4] should be 0 but it's %d", msg.Screen[4][4])
+	}
+	if b.Cursor.X != windowSize+4 {
+		t.Errorf("b.Cursor.X should be %d but it's %d", windowSize+4, b.Cursor.X)
+	}
+	if b.Cursor.Y != windowSize+4 {
+		t.Errorf("b.Cursor.Y should be %d but it's %d", windowSize+4, b.Cursor.Y)
+	}
+	if (*b.Canvas)[windowSize+4][windowSize+4] != 0 {
+		t.Errorf("canvas[%d][%d] should be 0 but it's %d", windowSize+4, windowSize+4, (*b.Canvas)[windowSize+4][windowSize+4])
 	}
 }

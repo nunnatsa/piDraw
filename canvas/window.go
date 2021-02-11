@@ -12,6 +12,6 @@ type matrix [][]datatype.Color
 type Window struct {
 	matrix
 	// top-left pixel location in the Canvas
-	X uint8 `json:"x,omitempty"`
-	Y uint8 `json:"y,omitempty"`
+	X uint8 `json:"x"`
+	Y uint8 `json:"y"`
 }

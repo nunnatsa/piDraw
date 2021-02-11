@@ -5,14 +5,30 @@
     <title>RPiDraw</title>
     <style>
         html {
+            color: white;
             background: black
         }
         table, td, th {
             border: 1px solid white;
         }
 
+        td {
+            text-align:center;
+            vertical-align:middle
+        }
+
         table {
             border-collapse: collapse;
+            margin: auto;
+        }
+
+        div#main {
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 3em;
         }
 
         td {
@@ -23,11 +39,19 @@
 </head>
 <body>
     
-<table id="matrix">
-</table>
-<p>
-<button id="reset" value="Reset">Reset</button>
-</p>
+<div id="main">
+    <h1>Pi Sense HAT Draw</h1>
+    <table id="matrix">
+    </table>
+</div>
+<div id="control">
+    <p>
+        <button id="reset" value="Reset">Reset</button>
+    </p>
+    <p>
+        <label for="colorPicker">Change Color</label> <input type="color" id="colorPicker" value="#ffffff"/>
+    </p>
+</div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript">
     const socket = new WebSocket("ws://{{.}}:8080/api/canvas/");
@@ -49,7 +73,7 @@
                 let cell = line[j]
                 let td = document.createElement("td")
                 td.id = getCelId(j, i)
-                td.style.backgroundColor = "#" + cell.toString(16)
+                td.style.backgroundColor = "#" + cell.toString(16).padStart(6, '0')
                 tr.appendChild(td)
             }
             mt.appendChild(tr)
@@ -59,11 +83,27 @@
         const cursorElement = document.getElementById(cursorID)
         cursorElement.style.color = reverseColor(cursorElement.style.backgroundColor)
         cursorElement.innerText = 'X'
+
+        colorPicker.value = `#${data.cursor.color.toString(16).padStart(6, '0')}`
     };
 
     const reset = document.getElementById("reset")
     reset.onclick = function(e) {
         $.post("http://{{.}}:8080/api/canvas/reset", "reset")
+    }
+
+    const colorPicker = document.getElementById("colorPicker")
+    colorPicker.onchange = function(e) {
+        console.log(`in colorPicker.onchange. colorPicker.value = ${colorPicker.value}`)
+        const colors = colorPicker.value.match(/^#([\da-f]+)$/)
+        if ( colors && colors.length === 2) {
+            const color = parseInt(colors[1], 16)
+            $.post(
+                "http://{{.}}:8080/api/canvas/color",
+                data=JSON.stringify({'color': color}),
+                dataType="json"
+            )
+        }
     }
 
     function getCelId(x, y) {

@@ -2,6 +2,7 @@ package canvas
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/nunnatsa/piDraw/datatype"
 	"log"
@@ -22,8 +23,24 @@ type Board struct {
 	Window       *Window `json:"window,omitempty"`
 	reg          *Notifier
 	hatEvents    <-chan datatype.HatEvent
-	clientEvents chan string
+	clientEvents chan clientEvent
 	screen       chan<- *datatype.DisplayMessage
+}
+
+type colorMessage struct {
+	Color datatype.Color `json:"color"`
+}
+
+type clientEventType int32
+
+const (
+	eventTypeReset clientEventType = iota
+	eventTypeColorChange
+)
+
+type clientEvent struct {
+	eventType clientEventType
+	data      interface{}
 }
 
 // NewBoard initiate a new Board
@@ -39,7 +56,7 @@ func NewBoard(events <-chan datatype.HatEvent, screen chan<- *datatype.DisplayMe
 		Window:       c.prepareWindow(windowSize, windowSize),
 		reg:          newNotifier(),
 		hatEvents:    events,
-		clientEvents: make(chan string),
+		clientEvents: make(chan clientEvent),
 		screen:       screen,
 	}
 
@@ -76,9 +93,12 @@ func (b *Board) do() {
 				changed = true
 			}
 		case event := <-b.clientEvents:
-			switch event {
-			case "reset":
+			switch event.eventType {
+			case eventTypeReset:
 				b.Reset()
+				changed = true
+			case eventTypeColorChange:
+				b.Cursor.SetColor(event.data.(datatype.Color))
 				changed = true
 			}
 		}
@@ -181,10 +201,19 @@ func (b *Board) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		log.Println("Connection is closed")
-	} else {
-		if r.URL.Path == "/reset" && r.Method == http.MethodPost {
-			b.clientEvents <- "reset"
+	} else if r.URL.Path == "/reset" && r.Method == http.MethodPost {
+		b.clientEvents <- clientEvent{eventType: eventTypeReset}
+	} else if r.URL.Path == "/color" && r.Method == http.MethodPost {
+		enc := json.NewDecoder(r.Body)
+		color := &colorMessage{}
+		if err := enc.Decode(color); err != nil {
+			log.Println("error while handling POST /api/canvas/color", err)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, `{"error": "can't process body"}`)
+			return
 		}
+		b.clientEvents <- clientEvent{eventType: eventTypeColorChange, data: color.Color}
 	}
 }
 

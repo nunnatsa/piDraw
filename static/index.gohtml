@@ -48,16 +48,40 @@
             for (let j = 0; j < line.length; j++) {
                 let cell = line[j]
                 let td = document.createElement("td")
-                td.style.background = "#" + cell.toString(16)
+                td.id = getCelId(j, i)
+                td.style.backgroundColor = "#" + cell.toString(16)
                 tr.appendChild(td)
             }
             mt.appendChild(tr)
         }
+
+        const cursorID = getCelId(data.cursor.x, data.cursor.y)
+        const cursorElement = document.getElementById(cursorID)
+        cursorElement.style.color = reverseColor(cursorElement.style.backgroundColor)
+        cursorElement.innerText = 'X'
     };
 
     const reset = document.getElementById("reset")
     reset.onclick = function(e) {
         $.post("http://{{.}}:8080/api/canvas/reset", "reset")
+    }
+
+    function getCelId(x, y) {
+        return `${x}`.padStart(2, '0') + '_' + `${y}`.padStart(2, '0')
+    }
+
+    function reverseColor(bg) {
+        const rx = /rgb\((\d+), (\d+), (\d+)\)/
+        let colors = bg.match(rx)
+        if (!colors) {
+            return 'rgb(255, 255, 255)'
+        }
+
+        const r = 255 - parseInt(colors[1])
+        const g = 255 - parseInt(colors[1])
+        const b = 255 - parseInt(colors[1])
+
+        return `rgb(${r}, ${g}, ${b}`
     }
 </script>
 </body>

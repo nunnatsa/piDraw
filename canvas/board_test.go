@@ -6,7 +6,7 @@ import (
 )
 
 func TestNewBoard(t *testing.T) {
-	b := NewBoard(nil, nil)
+	b := NewBoard(nil, nil, 3, 3)
 
 	if b.Window.matrix[4][4] != 0 {
 		t.Errorf("board should be initialized, but b.Window[4][4] is %d", b.Window.matrix[4][4])
@@ -25,10 +25,14 @@ func TestNewBoard(t *testing.T) {
 
 func TestMoveUpWindowMidleCursorMidle(t *testing.T) {
 	c := getTestCanvas()
+	centerX := canvasWidth / 2
+	centerY := canvasHeight / 2
 	b := &Board{
-		Canvas: c,
-		Cursor: &Cursor{X: centerX, Y: centerY, Color: 45},
-		Window: c.prepareWindow(windowSize, windowSize),
+		Canvas:  c,
+		Cursor:  &Cursor{X: centerX, Y: centerY, Color: 45},
+		Window:  c.prepareWindow(windowSize, windowSize),
+		centerX: centerX,
+		centerY: centerY,
 	}
 
 	b.MoveUp()
@@ -42,6 +46,11 @@ func TestMoveUpWindowMidleCursorMidle(t *testing.T) {
 }
 
 func TestMoveUpWindowMidleCursorTop(t *testing.T) {
+	w := uint8(4)
+	h := uint8(3)
+	centerX := w / 2
+	centerY := h / 2
+
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
@@ -60,6 +69,9 @@ func TestMoveUpWindowMidleCursorTop(t *testing.T) {
 }
 
 func TestMoveUpWindowTopCursorMidle(t *testing.T) {
+	w := uint8(4)
+	centerX := w / 2
+
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
@@ -78,6 +90,9 @@ func TestMoveUpWindowTopCursorMidle(t *testing.T) {
 }
 
 func TestMoveUpWindowTopCursorTop(t *testing.T) {
+	w := uint8(4)
+	centerX := w / 2
+
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
@@ -96,6 +111,11 @@ func TestMoveUpWindowTopCursorTop(t *testing.T) {
 }
 
 func TestMoveDownWindowMidleCursorMidle(t *testing.T) {
+	w := uint8(4)
+	h := uint8(3)
+	centerX := w / 2
+	centerY := h / 2
+
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
@@ -114,6 +134,9 @@ func TestMoveDownWindowMidleCursorMidle(t *testing.T) {
 }
 
 func TestMoveDownWindowMidleCursorBottom(t *testing.T) {
+	w := uint8(4)
+	centerX := w / 2
+
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
@@ -136,47 +159,60 @@ func TestMoveDownWindowMidleCursorBottom(t *testing.T) {
 }
 
 func TestMoveDownWindowBottomCursorMidle(t *testing.T) {
+	w := uint8(4)
+	h := uint8(3)
+	centerX := w / 2
+	canvasHeight := uint8(windowSize * h)
+
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
 		Cursor: &Cursor{
 			X:     centerX,
-			Y:     canvasHight - 5,
+			Y:     canvasHeight - 5,
 			Color: 45,
 		},
-		Window: c.prepareWindow(centerX, canvasHight-windowSize),
+		Window: c.prepareWindow(centerX, canvasHeight-windowSize),
 	}
 
 	b.MoveDown()
-	if b.Cursor.Y != canvasHight-4 {
+	if b.Cursor.Y != canvasHeight-4 {
 		t.Error("cursor should move down")
 	}
 
-	if b.Window.Y != canvasHight-windowSize {
+	if b.Window.Y != canvasHeight-windowSize {
 		t.Error("window should not move down")
 	}
 }
 
 func TestMoveDownWindowTopCursorBottom(t *testing.T) {
+	w := uint8(4)
+	h := uint8(3)
+	centerX := w / 2
+	canvasHeight := uint8(windowSize * h)
+
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
-		Cursor: &Cursor{X: centerX, Y: canvasHight - 1, Color: 45},
-		Window: c.prepareWindow(windowSize, canvasHight-windowSize),
+		Cursor: &Cursor{X: centerX, Y: canvasHeight - 1, Color: 45},
+		Window: c.prepareWindow(windowSize, canvasHeight-windowSize),
 	}
 
 	b.MoveDown()
-	if b.Cursor.Y != canvasHight-1 {
+	if b.Cursor.Y != canvasHeight-1 {
 		t.Error("cursor should not move down")
 	}
 
-	if b.Window.Y != canvasHight-windowSize {
+	if b.Window.Y != canvasHeight-windowSize {
 		t.Error("window should not move down")
 	}
 }
 
 func TestMoveLeftWindowMidleCursorMidle(t *testing.T) {
 	c := getTestCanvas()
+	centerX := canvasWidth / 2
+	centerY := canvasHeight / 2
+
 	b := &Board{
 		Canvas: c,
 		Cursor: &Cursor{X: centerX, Y: centerY, Color: 45},
@@ -194,6 +230,9 @@ func TestMoveLeftWindowMidleCursorMidle(t *testing.T) {
 }
 
 func TestMoveLeftWindowMidleCursorLeft(t *testing.T) {
+	h := uint8(3)
+	centerY := h / 2
+
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
@@ -212,6 +251,9 @@ func TestMoveLeftWindowMidleCursorLeft(t *testing.T) {
 }
 
 func TestMoveLeftWindowLeftCursorMidle(t *testing.T) {
+	h := uint8(3)
+	centerY := h / 2
+
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
@@ -230,6 +272,9 @@ func TestMoveLeftWindowLeftCursorMidle(t *testing.T) {
 }
 
 func TestMoveLeftWindowLeftCursorLeft(t *testing.T) {
+	h := uint8(3)
+	centerY := h / 2
+
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
@@ -248,6 +293,11 @@ func TestMoveLeftWindowLeftCursorLeft(t *testing.T) {
 }
 
 func TestMoveRightWindowMidleCursorMidle(t *testing.T) {
+	w := uint8(4)
+	h := uint8(3)
+	centerX := w / 2
+	centerY := h / 2
+
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
@@ -266,6 +316,9 @@ func TestMoveRightWindowMidleCursorMidle(t *testing.T) {
 }
 
 func TestMoveRightWindowMidleCursorRight(t *testing.T) {
+	h := uint8(3)
+	centerY := h / 2
+
 	c := getTestCanvas()
 	b := &Board{
 		Canvas: c,
@@ -289,6 +342,8 @@ func TestMoveRightWindowMidleCursorRight(t *testing.T) {
 
 func TestMoveRightWindowRightCursorMidle(t *testing.T) {
 	c := getTestCanvas()
+	centerY := canvasHeight / 2
+
 	b := &Board{
 		Canvas: c,
 		Cursor: &Cursor{
@@ -296,7 +351,7 @@ func TestMoveRightWindowRightCursorMidle(t *testing.T) {
 			Y:     centerY,
 			Color: 45,
 		},
-		Window: c.prepareWindow(canvasHight-windowSize, centerY),
+		Window: c.prepareWindow(canvasHeight-windowSize, centerY),
 	}
 
 	b.MoveRight()
@@ -311,6 +366,8 @@ func TestMoveRightWindowRightCursorMidle(t *testing.T) {
 
 func TestMoveRightWindowRightCursorRight(t *testing.T) {
 	c := getTestCanvas()
+	centerY := canvasHeight / 2
+
 	b := &Board{
 		Canvas: c,
 		Cursor: &Cursor{X: canvasWidth - 1, Y: centerY, Color: 45},
@@ -337,8 +394,8 @@ func TestBoardSet(t *testing.T) {
 
 	b.DrawPixel()
 
-	if (*b.Canvas)[windowSize-1][windowSize+1] != 45 {
-		t.Errorf("should set (%d, %d) to 45, but it's %d instead", windowSize+1, windowSize-1, (*b.Canvas)[windowSize-1][windowSize+1])
+	if b.Canvas[windowSize-1][windowSize+1] != 45 {
+		t.Errorf("should set (%d, %d) to 45, but it's %d instead", windowSize+1, windowSize-1, b.Canvas[windowSize-1][windowSize+1])
 	}
 }
 
@@ -352,24 +409,29 @@ func TestBoardDelete(t *testing.T) {
 
 	b.DeletePixel()
 
-	if (*b.Canvas)[windowSize-1][windowSize+1] != 0 {
-		t.Errorf("should Delete (%d, %d), but it's %d instead", windowSize+1, windowSize-1, (*b.Canvas)[windowSize-1][windowSize+1])
+	if b.Canvas[windowSize-1][windowSize+1] != 0 {
+		t.Errorf("should Delete (%d, %d), but it's %d instead", windowSize+1, windowSize-1, b.Canvas[windowSize-1][windowSize+1])
 	}
 }
 
 func TestResetBoard(t *testing.T) {
 	c := getTestCanvas()
+	centerX := canvasWidth / 2
+	centerY := canvasHeight / 2
+
 	b := &Board{
-		Canvas: c,
-		Cursor: &Cursor{X: 0, Y: 0, Color: 45},
-		Window: c.prepareWindow(0, 0),
+		Canvas:  c,
+		Cursor:  &Cursor{X: 0, Y: 0, Color: 45},
+		Window:  c.prepareWindow(0, 0),
+		centerX: centerX,
+		centerY: centerY,
 	}
 	b.Reset()
 
-	for y := 0; y < canvasHight; y++ {
-		for x := 0; x < canvasWidth; x++ {
-			if (*b.Canvas)[y][x] != 0 {
-				t.Errorf("(%d, %d) shold be 0 but it %d", x, y, (*b.Canvas)[y][x])
+	for y := uint8(0); y < canvasHeight; y++ {
+		for x := uint8(0); x < canvasWidth; x++ {
+			if b.Canvas[y][x] != 0 {
+				t.Errorf("(%d, %d) shold be 0 but it %d", x, y, b.Canvas[y][x])
 			}
 		}
 	}
@@ -409,6 +471,8 @@ func TestDo(t *testing.T) {
 		clientEvents: clientEvents,
 		screen:       screenEvents,
 		reg:          newNotifier(),
+		centerX:      canvasWidth / 2,
+		centerY:      canvasHeight / 2,
 	}
 
 	go b.do()
@@ -450,8 +514,8 @@ func TestDo(t *testing.T) {
 	}
 
 	// make sure the original value is there, before changing
-	if (*b.Canvas)[windowSize+4][windowSize+4] != 13 {
-		t.Errorf("canvas[%d][%d] should be 13 but it's %d", windowSize+4, windowSize+4, (*b.Canvas)[windowSize+4][windowSize+4])
+	if b.Canvas[windowSize+4][windowSize+4] != 13 {
+		t.Errorf("Canvas[%d][%d] should be 13 but it's %d", windowSize+4, windowSize+4, b.Canvas[windowSize+4][windowSize+4])
 	}
 	hatEvents <- datatype.Pressed
 	msg = <-screenEvents
@@ -470,8 +534,8 @@ func TestDo(t *testing.T) {
 	if b.Cursor.Y != windowSize+4 {
 		t.Errorf("b.Cursor.Y should be %d but it's %d", windowSize+4, b.Cursor.Y)
 	}
-	if (*b.Canvas)[windowSize+4][windowSize+4] != 45 {
-		t.Errorf("canvas[%d][%d] should be 45 but it's %d", windowSize+4, windowSize+4, (*b.Canvas)[windowSize+4][windowSize+4])
+	if b.Canvas[windowSize+4][windowSize+4] != 45 {
+		t.Errorf("Canvas[%d][%d] should be 45 but it's %d", windowSize+4, windowSize+4, b.Canvas[windowSize+4][windowSize+4])
 	}
 
 	clientEvents <- clientEvent{eventType: clientEventType(0xFFFF)}
@@ -496,7 +560,7 @@ func TestDo(t *testing.T) {
 	if b.Cursor.Y != windowSize+4 {
 		t.Errorf("b.Cursor.Y should be %d but it's %d", windowSize+4, b.Cursor.Y)
 	}
-	if (*b.Canvas)[windowSize+4][windowSize+4] != 0 {
-		t.Errorf("canvas[%d][%d] should be 0 but it's %d", windowSize+4, windowSize+4, (*b.Canvas)[windowSize+4][windowSize+4])
+	if b.Canvas[windowSize+4][windowSize+4] != 0 {
+		t.Errorf("Canvas[%d][%d] should be 0 but it's %d", windowSize+4, windowSize+4, b.Canvas[windowSize+4][windowSize+4])
 	}
 }

@@ -54,7 +54,7 @@
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript">
-    const socket = new WebSocket("ws://{{.}}:8080/api/canvas/");
+    const socket = new WebSocket("ws://{{.Host}}:{{.Port}}/api/canvas/");
 
     let elm
 
@@ -110,7 +110,7 @@
 
     const reset = document.getElementById("reset")
     reset.onclick = function(e) {
-        $.post("http://{{.}}:8080/api/canvas/reset", "reset")
+        $.post("http://{{.Host}}:{{.Port}}/api/canvas/reset", "reset")
     }
 
     const colorPicker = document.getElementById("colorPicker")
@@ -120,7 +120,7 @@
         if ( colors && colors.length === 2) {
             const color = parseInt(colors[1], 16)
             $.post(
-                "http://{{.}}:8080/api/canvas/color",
+                "http://{{.Host}}:{{.Port}}/api/canvas/color",
                 data=JSON.stringify({'color': color}),
                 dataType="json"
             )

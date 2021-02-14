@@ -1,8 +1,6 @@
 package canvas
 
 import (
-	"github.com/nunnatsa/piDraw/datatype"
-	"github.com/nunnatsa/piDraw/notifier"
 	"log"
 )
 
@@ -16,10 +14,6 @@ type Board struct {
 	Canvas       Canvas  `json:"canvas,omitempty"`
 	Cursor       *Cursor `json:"cursor,omitempty"`
 	Window       *Window `json:"window,omitempty"`
-	mailbox      *notifier.Notifier
-	hatEvents    <-chan datatype.HatEvent
-	clientEvents <-chan datatype.ClientEvent
-	screen       chan<- *datatype.DisplayMessage
 	centerX      uint8
 	centerY      uint8
 }

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RPiDraw</title>
+    <style>
+        html {
+            color: white;
+            background: black;
+        }
+        table, td, th {
+            border: 1px solid white;
+        }
+
+        td {
+            text-align:center;
+            vertical-align:middle
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: auto;
+        }
+
+        div#main {
+            margin: auto;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        div#control {
+            margin-top: 1em;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2em;
+        }
+
+        td {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    
+<div id="main">
+    <h1>Pi Sense HAT Draw</h1>
+    <table id="matrix">
+    </table>
+    <div id="control">
+        <p>
+            <button id="reset" value="Reset">Reset</button>
+        </p>
+        <p>
+            <button id="pickColor" value="Reset" about="set the cursor color to the color of the current pixel">Pick Color From Pixel</button>
+        </p>
+        <p>
+            <label for="colorPicker">Change Color</label> <input type="color" id="colorPicker" value="#ffffff"/>
+        </p>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+    let cursorID
+
+    const socket = new WebSocket("ws://{{.Host}}:{{.Port}}/api/canvas/register");
+    socket.onmessage = function (e) {
+        const data = JSON.parse(e.data)
+        console.log(`Received new canvas: ${e.data}`)
+        let mt = document.getElementById("matrix")
+        while (mt.lastElementChild) {
+            mt.removeChild(mt.lastElementChild);
+        }
+
+        for ( let i = 0; i < data.canvas.length; i++ ) {
+            let line = data.canvas[i]
+            let tr = document.createElement("tr")
+            for (let j = 0; j < line.length; j++) {
+                let cell = line[j]
+                let td = document.createElement("td")
+                td.id = getCelId(j, i)
+                td.style.backgroundColor = "#" + cell.toString(16).padStart(6, '0')
+
+                if (i === data.window.y) {
+                    if (j >= data.window.x && j <= data.window.x + 7) {
+                        td.style.borderTopWidth="3px"
+                    }
+                } else if (i === data.window.y + 7) {
+                    if (j >= data.window.x && j <= data.window.x + 7) {
+                        td.style.borderBottomWidth = "3px"
+                    }
+                }
+
+                if (j === data.window.x) {
+                    if (i >= data.window.y && i <= data.window.y + 7) {
+                        td.style.borderLeftWidth="3px"
+                    }
+                } else if (j === data.window.x + 7) {
+                    if (i >= data.window.y && i <= data.window.y + 7) {
+                        td.style.borderRightWidth = "3px"
+                    }
+                }
+
+                tr.appendChild(td)
+            }
+            mt.appendChild(tr)
+        }
+
+        cursorID = getCelId(data.cursor.x, data.cursor.y)
+        const cursorElement = document.getElementById(cursorID)
+        cursorElement.style.color = reverseColor(cursorElement.style.backgroundColor)
+        cursorElement.innerText = 'X'
+
+        colorPicker.value = `#${data.cursor.color.toString(16).padStart(6, '0')}`
+    };
+
+    const reset = document.getElementById("reset")
+    reset.onclick = function(e) {
+        $.post("http://{{.Host}}:{{.Port}}/api/canvas/reset", "reset")
+    }
+
+    const pickColor = document.getElementById("pickColor")
+    pickColor.onclick = function(e) {
+        // $.post("http://{{.Host}}:{{.Port}}/api/canvas/reset", "reset")
+        const cell = document.getElementById(cursorID)
+        const colors = cell.style.backgroundColor.match(/rgb\((\d+), (\d+), (\d+)\)/)
+        if (colors && colors.length === 4) {
+            const red = parseInt(colors[1]) << 16
+            const green = parseInt(colors[2]) << 8
+            const blue = parseInt(colors[3])
+            const color = red | green | blue
+            $.post(
+                "http://{{.Host}}:{{.Port}}/api/canvas/color",
+                data=JSON.stringify({'color': color}),
+                dataType="json"
+            )
+        }
+    }
+
+    const colorPicker = document.getElementById("colorPicker")
+    colorPicker.onchange = function(e) {
+        console.log(`in colorPicker.onchange. colorPicker.value = ${colorPicker.value}`)
+        const colors = colorPicker.value.match(/^#([\da-f]+)$/)
+        if ( colors && colors.length === 2) {
+            const color = parseInt(colors[1], 16)
+            $.post(
+                "http://{{.Host}}:{{.Port}}/api/canvas/color",
+                data=JSON.stringify({'color': color}),
+                dataType="json"
+            )
+        }
+    }
+
+    function getCelId(x, y) {
+        return `${x}`.padStart(2, '0') + '_' + `${y}`.padStart(2, '0')
+    }
+
+    function reverseColor(bg) {
+        const rx = /rgb\((\d+), (\d+), (\d+)\)/
+        let colors = bg.match(rx)
+        if (!colors) {
+            return 'rgb(255, 255, 255)'
+        }
+
+        const r = 255 - parseInt(colors[1])
+        const g = 255 - parseInt(colors[1])
+        const b = 255 - parseInt(colors[1])
+
+        return `rgb(${r}, ${g}, ${b}`
+    }
+</script>
+</body>
+</html>

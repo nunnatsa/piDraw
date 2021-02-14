@@ -14,17 +14,22 @@ var (
 		ReadBufferSize:  1500,
 		WriteBufferSize: 1500,
 	}
+
+	canvasWidth  uint8
+	canvasHeight uint8
 )
 
 // Board is the draing board.
 type Board struct {
-	Canvas       *Canvas `json:"canvas,omitempty"`
+	Canvas       Canvas  `json:"canvas,omitempty"`
 	Cursor       *Cursor `json:"cursor,omitempty"`
 	Window       *Window `json:"window,omitempty"`
 	reg          *Notifier
 	hatEvents    <-chan datatype.HatEvent
 	clientEvents chan clientEvent
 	screen       chan<- *datatype.DisplayMessage
+	centerX      uint8
+	centerY      uint8
 }
 
 type colorMessage struct {
@@ -44,7 +49,12 @@ type clientEvent struct {
 }
 
 // NewBoard initiate a new Board
-func NewBoard(events <-chan datatype.HatEvent, screen chan<- *datatype.DisplayMessage) *Board {
+func NewBoard(events <-chan datatype.HatEvent, screen chan<- *datatype.DisplayMessage, width, height uint8) *Board {
+	canvasWidth = width * windowSize
+	canvasHeight = height * windowSize
+	centerX := canvasWidth / 2
+	centerY := canvasHeight / 2
+
 	c := newCanvas()
 	b := &Board{
 		Canvas: c,
@@ -53,11 +63,13 @@ func NewBoard(events <-chan datatype.HatEvent, screen chan<- *datatype.DisplayMe
 			Y:     centerY,
 			Color: 0xFFFFFF,
 		},
-		Window:       c.prepareWindow(windowSize, windowSize),
+		Window:       c.prepareWindow(centerX-(windowSize/2), centerY-(windowSize/2)),
 		reg:          newNotifier(),
 		hatEvents:    events,
 		clientEvents: make(chan clientEvent),
 		screen:       screen,
+		centerX:      centerX,
+		centerY:      centerY,
 	}
 
 	go b.do()
@@ -146,25 +158,29 @@ func (b *Board) MoveRight() {
 
 // DrawPixel writes the pixel the the cursor is currently pointing at, to the Color of the cursor
 func (b *Board) DrawPixel() {
-	b.Canvas.Set(b.Cursor)
+	if err := b.Canvas.Set(b.Cursor); err != nil {
+		log.Println(err)
+	}
 }
 
 // DeletePixel writes the pixel the the cursor is currently pointing at, to the Color of the cursor
 func (b *Board) DeletePixel() {
-	b.Canvas.Delete(b.Cursor)
+	if err := b.Canvas.Delete(b.Cursor); err != nil {
+		log.Println(err)
+	}
 }
 
 // Reset return the board to the initiate state
 func (b *Board) Reset() {
-	log.Println("Reseting the canvas")
+	log.Println("Reseting the Canvas")
 	b.Canvas = newCanvas()
 	b.Cursor = &Cursor{
-		X:     centerX,
-		Y:     centerY,
+		X:     b.centerX,
+		Y:     b.centerY,
 		Color: 0xFFFFFF,
 	}
-	b.Window = b.Canvas.prepareWindow(windowSize, windowSize)
-	log.Println("canvas is clean now")
+	b.Window = b.Canvas.prepareWindow(b.centerX-(windowSize/2), b.centerY-(windowSize/2))
+	log.Println("Canvas is clean now")
 }
 
 func (b *Board) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -207,7 +223,7 @@ func (b *Board) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		enc := json.NewDecoder(r.Body)
 		color := &colorMessage{}
 		if err := enc.Decode(color); err != nil {
-			log.Println("error while handling POST /api/canvas/color", err)
+			log.Println("error while handling POST /api/Canvas/color", err)
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprintf(w, `{"error": "can't process body"}`)

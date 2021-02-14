@@ -5,23 +5,16 @@ import (
 	"github.com/nunnatsa/piDraw/datatype"
 )
 
-const (
-	canvasHight = windowSize * 3
-	canvasWidth = windowSize * 3
-	centerX     = canvasWidth / 2
-	centerY     = canvasHight / 2
-)
-
 // Canvas is the virtual Canvas for the drawing
 type Canvas [][]datatype.Color
 
-func newCanvas() *Canvas {
-	c := make([][]datatype.Color, canvasHight)
-	for y := 0; y < canvasHight; y++ {
+func newCanvas() Canvas {
+	c := make([][]datatype.Color, canvasHeight)
+	for y := 0; uint8(y) < canvasHeight; y++ {
 		c[y] = make([]datatype.Color, canvasWidth)
 	}
 
-	return ((*Canvas)(&c))
+	return c
 }
 
 func (c Canvas) prepareWindow(x, y uint8) *Window {
@@ -34,9 +27,11 @@ func (c Canvas) prepareWindow(x, y uint8) *Window {
 	return &Window{matrix: m, X: x, Y: y}
 }
 
+
+
 // Set set the Color of one pixel in the Canvas
 func (c *Canvas) Set(cr *Cursor) error {
-	if cr.X >= canvasHight || cr.Y >= canvasWidth {
+	if cr.X >= canvasWidth || cr.Y >= canvasHeight {
 		return fmt.Errorf(`(%d, %d) is out of the Canvas size`, cr.X, cr.Y)
 	}
 
@@ -47,7 +42,7 @@ func (c *Canvas) Set(cr *Cursor) error {
 
 // Delete deletes one pixel in the Canvas
 func (c *Canvas) Delete(cr *Cursor) error {
-	if cr.X >= canvasHight || cr.Y >= canvasWidth {
+	if cr.X >= canvasWidth || cr.Y >= canvasHeight {
 		return fmt.Errorf(`(%d, %d) is out of the Canvas size`, cr.X, cr.Y)
 	}
 
@@ -58,8 +53,8 @@ func (c *Canvas) Delete(cr *Cursor) error {
 
 // Reset set all the pixel in the Canvas to zero
 func (c *Canvas) Reset() {
-	for y := 0; y < canvasHight; y++ {
-		for x := 0; x < canvasWidth; x++ {
+	for y := 0; uint8(y) < canvasHeight; y++ {
+		for x := 0; uint8(x) < canvasWidth; x++ {
 			(*c)[y][x] = 0
 		}
 	}

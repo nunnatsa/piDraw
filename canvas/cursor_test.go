@@ -29,14 +29,14 @@ func TestMoveUpTop(t *testing.T) {
 }
 
 func TestMoveUpBottom(t *testing.T) {
-	c := Cursor{X: 8, Y: canvasHight - 1}
+	c := Cursor{X: 8, Y: canvasHeight - 1}
 	c.MoveUp()
 
 	if c.X != 8 {
 		t.Errorf("X should not be changed, but it's %d", c.X)
 	}
 
-	if c.Y != canvasHight-2 {
+	if c.Y != canvasHeight-2 {
 		t.Errorf("Y should not be decreased by 1, but it's %d", c.Y)
 	}
 }
@@ -68,14 +68,14 @@ func TestMoveDownTop(t *testing.T) {
 }
 
 func TestMoveDownBottom(t *testing.T) {
-	c := Cursor{X: 8, Y: canvasHight - 1}
+	c := Cursor{X: 8, Y: canvasHeight - 1}
 	c.MoveDown()
 
 	if c.X != 8 {
 		t.Errorf("X should not be changed, but it's %d", c.X)
 	}
 
-	if c.Y != canvasHight-1 {
+	if c.Y != canvasHeight-1 {
 		t.Errorf("Y should not be dechanged, but it's %d", c.Y)
 	}
 }

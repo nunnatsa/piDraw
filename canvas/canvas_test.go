@@ -125,8 +125,8 @@ func TestPrepareWindow(t *testing.T) {
 
 	w := c.prepareWindow(4, 6)
 
-	if w.matrix[1][2] != 7 {
-		t.Errorf("w[1][2] should be 7, but it's %d", w.matrix[1][2])
+	if w.Matrix[1][2] != 7 {
+		t.Errorf("w[1][2] should be 7, but it's %d", w.Matrix[1][2])
 	}
 }
 

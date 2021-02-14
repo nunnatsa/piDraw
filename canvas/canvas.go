@@ -18,16 +18,14 @@ func newCanvas() Canvas {
 }
 
 func (c Canvas) prepareWindow(x, y uint8) *Window {
-	m := matrix(make([][]datatype.Color, windowSize))
+	m := Matrix(make([][]datatype.Color, windowSize))
 
 	for i := uint8(0); i < windowSize; i++ {
 		m[i] = c[y+i][x : x+windowSize]
 	}
 
-	return &Window{matrix: m, X: x, Y: y}
+	return &Window{Matrix: m, X: x, Y: y}
 }
-
-
 
 // Set set the Color of one pixel in the Canvas
 func (c *Canvas) Set(cr *Cursor) error {

@@ -32,3 +32,16 @@ func (dm DisplayMessage) String() string {
 
 // Color is the Color of one pixel in the Canvas
 type Color uint32
+
+type ClientEventType int32
+
+const (
+	EventTypeReset ClientEventType = iota
+	EventTypeColorChange
+	EventClientRegistered
+)
+
+type ClientEvent struct {
+	EventType ClientEventType
+	Data      interface{}
+}

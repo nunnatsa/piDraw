@@ -1,4 +1,4 @@
-package canvas
+package notifier
 
 import (
 	"sync"
@@ -8,7 +8,7 @@ import (
 
 func TestSubscribe(t *testing.T) {
 	const numSubscribers = 10
-	n := newNotifier()
+	n := NewNotifier()
 	defer cleanup(n)
 	wg := &sync.WaitGroup{}
 
@@ -35,7 +35,7 @@ func TestSubscribe(t *testing.T) {
 }
 
 func TestUnsubscribe(t *testing.T) {
-	n := newNotifier()
+	n := NewNotifier()
 	ch := make(chan []byte)
 
 	id := n.Subscribe(ch)
@@ -55,7 +55,7 @@ func TestUnsubscribe(t *testing.T) {
 
 func TestNotify(t *testing.T) {
 	const numSubscribers = 10
-	n := newNotifier()
+	n := NewNotifier()
 	defer cleanup(n)
 
 	channels := make([]chan []byte, numSubscribers)

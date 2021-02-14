@@ -1,15 +1,14 @@
 package canvas
 
 import (
-	"github.com/nunnatsa/piDraw/datatype"
 	"testing"
 )
 
 func TestNewBoard(t *testing.T) {
-	b := NewBoard(nil, nil, 3, 3)
+	b := NewBoard(3, 3)
 
-	if b.Window.matrix[4][4] != 0 {
-		t.Errorf("board should be initialized, but b.Window[4][4] is %d", b.Window.matrix[4][4])
+	if b.Window.Matrix[4][4] != 0 {
+		t.Errorf("board should be initialized, but b.Window[4][4] is %d", b.Window.Matrix[4][4])
 	}
 
 	b.Cursor.SetColor(15)
@@ -18,12 +17,12 @@ func TestNewBoard(t *testing.T) {
 		t.Errorf("should not return error; error is %v", err)
 	}
 
-	if b.Window.matrix[4][4] != 15 {
-		t.Errorf("b.Window[4][4] should be 15, but it's %d", b.Window.matrix[4][4])
+	if b.Window.Matrix[4][4] != 15 {
+		t.Errorf("b.Window[4][4] should be 15, but it's %d", b.Window.Matrix[4][4])
 	}
 }
 
-func TestMoveUpWindowMidleCursorMidle(t *testing.T) {
+func TestMoveUpWindowMiddleCursorMiddle(t *testing.T) {
 	c := getTestCanvas()
 	centerX := canvasWidth / 2
 	centerY := canvasHeight / 2
@@ -45,7 +44,7 @@ func TestMoveUpWindowMidleCursorMidle(t *testing.T) {
 	}
 }
 
-func TestMoveUpWindowMidleCursorTop(t *testing.T) {
+func TestMoveUpWindowMiddleCursorTop(t *testing.T) {
 	w := uint8(4)
 	h := uint8(3)
 	centerX := w / 2
@@ -68,7 +67,7 @@ func TestMoveUpWindowMidleCursorTop(t *testing.T) {
 	}
 }
 
-func TestMoveUpWindowTopCursorMidle(t *testing.T) {
+func TestMoveUpWindowTopCursorMiddle(t *testing.T) {
 	w := uint8(4)
 	centerX := w / 2
 
@@ -110,7 +109,7 @@ func TestMoveUpWindowTopCursorTop(t *testing.T) {
 	}
 }
 
-func TestMoveDownWindowMidleCursorMidle(t *testing.T) {
+func TestMoveDownWindowMiddleCursorMiddle(t *testing.T) {
 	w := uint8(4)
 	h := uint8(3)
 	centerX := w / 2
@@ -133,7 +132,7 @@ func TestMoveDownWindowMidleCursorMidle(t *testing.T) {
 	}
 }
 
-func TestMoveDownWindowMidleCursorBottom(t *testing.T) {
+func TestMoveDownWindowMiddleCursorBottom(t *testing.T) {
 	w := uint8(4)
 	centerX := w / 2
 
@@ -158,7 +157,7 @@ func TestMoveDownWindowMidleCursorBottom(t *testing.T) {
 	}
 }
 
-func TestMoveDownWindowBottomCursorMidle(t *testing.T) {
+func TestMoveDownWindowBottomCursorMiddle(t *testing.T) {
 	w := uint8(4)
 	h := uint8(3)
 	centerX := w / 2
@@ -208,7 +207,7 @@ func TestMoveDownWindowTopCursorBottom(t *testing.T) {
 	}
 }
 
-func TestMoveLeftWindowMidleCursorMidle(t *testing.T) {
+func TestMoveLeftWindowMiddleCursorMiddle(t *testing.T) {
 	c := getTestCanvas()
 	centerX := canvasWidth / 2
 	centerY := canvasHeight / 2
@@ -229,7 +228,7 @@ func TestMoveLeftWindowMidleCursorMidle(t *testing.T) {
 	}
 }
 
-func TestMoveLeftWindowMidleCursorLeft(t *testing.T) {
+func TestMoveLeftWindowMiddleCursorLeft(t *testing.T) {
 	h := uint8(3)
 	centerY := h / 2
 
@@ -250,7 +249,7 @@ func TestMoveLeftWindowMidleCursorLeft(t *testing.T) {
 	}
 }
 
-func TestMoveLeftWindowLeftCursorMidle(t *testing.T) {
+func TestMoveLeftWindowLeftCursorMiddle(t *testing.T) {
 	h := uint8(3)
 	centerY := h / 2
 
@@ -292,7 +291,7 @@ func TestMoveLeftWindowLeftCursorLeft(t *testing.T) {
 	}
 }
 
-func TestMoveRightWindowMidleCursorMidle(t *testing.T) {
+func TestMoveRightWindowMiddleCursorMiddle(t *testing.T) {
 	w := uint8(4)
 	h := uint8(3)
 	centerX := w / 2
@@ -315,7 +314,7 @@ func TestMoveRightWindowMidleCursorMidle(t *testing.T) {
 	}
 }
 
-func TestMoveRightWindowMidleCursorRight(t *testing.T) {
+func TestMoveRightWindowMiddleCursorRight(t *testing.T) {
 	h := uint8(3)
 	centerY := h / 2
 
@@ -340,7 +339,7 @@ func TestMoveRightWindowMidleCursorRight(t *testing.T) {
 	}
 }
 
-func TestMoveRightWindowRightCursorMidle(t *testing.T) {
+func TestMoveRightWindowRightCursorMiddle(t *testing.T) {
 	c := getTestCanvas()
 	centerY := canvasHeight / 2
 
@@ -454,113 +453,5 @@ func TestResetBoard(t *testing.T) {
 
 	if b.Window.Y != windowSize {
 		t.Errorf("b.Window.Y should be %d but it's %d", windowSize, b.Window.Y)
-	}
-}
-
-func TestDo(t *testing.T) {
-	hatEvents := make(chan datatype.HatEvent)
-	clientEvents := make(chan clientEvent)
-	screenEvents := make(chan *datatype.DisplayMessage)
-
-	c := getTestCanvas()
-	b := &Board{
-		Canvas:       c,
-		Cursor:       &Cursor{X: windowSize + 4, Y: windowSize + 4, Color: 45},
-		Window:       c.prepareWindow(windowSize, windowSize),
-		hatEvents:    hatEvents,
-		clientEvents: clientEvents,
-		screen:       screenEvents,
-		reg:          newNotifier(),
-		centerX:      canvasWidth / 2,
-		centerY:      canvasHeight / 2,
-	}
-
-	go b.do()
-
-	hatEvents <- datatype.MoveDown
-	msg := <-screenEvents
-	if msg.CursorY != 5 {
-		t.Errorf("msg.CursorY should be 5 but it's %d", msg.CursorY)
-	}
-	if b.Cursor.Y != windowSize+5 {
-		t.Errorf("b.Cursor.Y should be %d but it's %d", windowSize+5, b.Cursor.Y)
-	}
-
-	hatEvents <- datatype.MoveUp
-	msg = <-screenEvents
-	if msg.CursorY != 4 {
-		t.Errorf("msg.CursorY should be 4 but it's %d", msg.CursorY)
-	}
-	if b.Cursor.Y != windowSize+4 {
-		t.Errorf("b.Cursor.Y should be %d but it's %d", windowSize+4, b.Cursor.Y)
-	}
-
-	hatEvents <- datatype.MoveRight
-	msg = <-screenEvents
-	if msg.CursorX != 5 {
-		t.Errorf("msg.CursorX should be 5 but it's %d", msg.CursorX)
-	}
-	if b.Cursor.X != windowSize+5 {
-		t.Errorf("b.Cursor.X should be %d but it's %d", windowSize+5, b.Cursor.X)
-	}
-
-	hatEvents <- datatype.MoveLeft
-	msg = <-screenEvents
-	if msg.CursorX != 4 {
-		t.Errorf("msg.CursorX should be 4 but it's %d", msg.CursorX)
-	}
-	if b.Cursor.X != windowSize+4 {
-		t.Errorf("b.Cursor.X should be %d but it's %d", windowSize+4, b.Cursor.X)
-	}
-
-	// make sure the original value is there, before changing
-	if b.Canvas[windowSize+4][windowSize+4] != 13 {
-		t.Errorf("Canvas[%d][%d] should be 13 but it's %d", windowSize+4, windowSize+4, b.Canvas[windowSize+4][windowSize+4])
-	}
-	hatEvents <- datatype.Pressed
-	msg = <-screenEvents
-	if msg.CursorX != 4 {
-		t.Errorf("msg.CursorX should be 4 but it's %d", msg.CursorX)
-	}
-	if msg.CursorY != 4 {
-		t.Errorf("msg.CursorY should be 4 but it's %d", msg.CursorY)
-	}
-	if msg.Screen[4][4] != 45 {
-		t.Errorf("msg.Screen[4][4] should be 45 but it's %d", msg.Screen[4][4])
-	}
-	if b.Cursor.X != windowSize+4 {
-		t.Errorf("b.Cursor.X should be %d but it's %d", windowSize+4, b.Cursor.X)
-	}
-	if b.Cursor.Y != windowSize+4 {
-		t.Errorf("b.Cursor.Y should be %d but it's %d", windowSize+4, b.Cursor.Y)
-	}
-	if b.Canvas[windowSize+4][windowSize+4] != 45 {
-		t.Errorf("Canvas[%d][%d] should be 45 but it's %d", windowSize+4, windowSize+4, b.Canvas[windowSize+4][windowSize+4])
-	}
-
-	clientEvents <- clientEvent{eventType: clientEventType(0xFFFF)}
-	if len(screenEvents) > 0 {
-		t.Errorf("Should do nothing, but produced screen event %v", <-screenEvents)
-	}
-
-	clientEvents <- clientEvent{eventType: eventTypeReset}
-	msg = <-screenEvents
-	if msg.CursorX != 4 {
-		t.Errorf("msg.CursorX should be 4 but it's %d", msg.CursorX)
-	}
-	if msg.CursorY != 4 {
-		t.Errorf("msg.CursorY should be 4 but it's %d", msg.CursorY)
-	}
-	if msg.Screen[4][4] != 0 {
-		t.Errorf("msg.Screen[4][4] should be 0 but it's %d", msg.Screen[4][4])
-	}
-	if b.Cursor.X != windowSize+4 {
-		t.Errorf("b.Cursor.X should be %d but it's %d", windowSize+4, b.Cursor.X)
-	}
-	if b.Cursor.Y != windowSize+4 {
-		t.Errorf("b.Cursor.Y should be %d but it's %d", windowSize+4, b.Cursor.Y)
-	}
-	if b.Canvas[windowSize+4][windowSize+4] != 0 {
-		t.Errorf("Canvas[%d][%d] should be 0 but it's %d", windowSize+4, windowSize+4, b.Canvas[windowSize+4][windowSize+4])
 	}
 }

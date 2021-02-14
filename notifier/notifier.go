@@ -1,4 +1,4 @@
-package canvas
+package notifier
 
 import (
 	"log"
@@ -25,7 +25,7 @@ type Notifier struct {
 	lock      *sync.Mutex
 }
 
-func newNotifier() *Notifier {
+func NewNotifier() *Notifier {
 	return &Notifier{
 		clientMap: make(map[int64]chan []byte),
 		idp:       &idProvider{lock: &sync.Mutex{}},
@@ -56,17 +56,26 @@ func (n *Notifier) Unsubscribe(id int64) {
 
 func (n *Notifier) Notify(data []byte) {
 	for id, subscriber := range n.clientMap {
-		go func(subID int64, subscriber chan<- []byte, data []byte) {
-			subscriber <- data
-			to := time.After(time.Millisecond * 100)
-			select {
-			case <-to:
-				log.Printf("Failed to send a message to subscriber %d. Unbscribing...", subID)
-				n.Unsubscribe(subID)
-			default:
-				return
-			}
+		go n.sendToSubscriber(id, subscriber, data)
+	}
+}
 
-		}(id, subscriber, data)
+func (n *Notifier) NotifyOne(id int64, data []byte) {
+	if subscriber, ok := n.clientMap[id]; ok {
+		go n.sendToSubscriber(id, subscriber, data)
+	} else {
+		log.Printf("subscriber id %d was not found", id)
+	}
+}
+
+func (n Notifier) sendToSubscriber(subID int64, subscriber chan<- []byte, data []byte) {
+	subscriber <- data
+	timeout := time.After(time.Millisecond * 100)
+	select {
+	case <-timeout:
+		log.Printf("Failed timeout send a message timeout subscriber %d. Unbscribing...", subID)
+		n.Unsubscribe(subID)
+	default:
+		return
 	}
 }

@@ -3,13 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/nunnatsa/piDraw/hat"
+	"github.com/nunnatsa/piDraw/controller"
+	"github.com/nunnatsa/piDraw/notifier"
 	"github.com/nunnatsa/piDraw/webapp"
 	"log"
 	"net/http"
-
-	"github.com/nunnatsa/piDraw/canvas"
-	"github.com/nunnatsa/piDraw/datatype"
 )
 
 var (
@@ -37,12 +35,10 @@ func init() {
 }
 
 func main() {
-	events := make(chan datatype.HatEvent)
-	screen := make(chan *datatype.DisplayMessage, 100)
-
-	c := canvas.NewBoard(events, screen, uint8(width), uint8(height))
-	_ = hat.NewHat(events, screen)
-	mux := webapp.GetMux(uint16(port))
-	mux.Handle("/api/canvas/", http.StripPrefix("/api/canvas", c))
+	mailbox := notifier.NewNotifier()
+	control := controller.NewController(uint8(width), uint8(height), mailbox)
+	ca := webapp.NewClientAction(mailbox, uint16(port), control.GetClientEvents())
+	mux := ca.GetMux()
+	control.Start()
 	log.Panic(http.ListenAndServe(fmt.Sprintf(":%d", port), mux))
 }

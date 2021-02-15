@@ -22,11 +22,19 @@ The notifier then sends the message to all the registered client - meaning the o
 
 The javascript in the HTML keep reading these messages and updates the web display.
 
-The webapp also provides two APIs: `/api/canvas/reset` to reset the picture, and `/api/canvas/color`
-to change the cursor (the pen) color. The javascript script uses these APIs when the user press buttons in the web page.
+The webapp also provides three APIs: 
+* `POST /api/canvas/reset` to reset the picture
+* `POST /api/canvas/color` to change the cursor (the pen) color
+* `GET /api/canvas/color?pixelSize={pixelSize}` to download the image as a png file.
+
+The javascript script uses these APIs when the user press buttons in the web page.
 The webapp, when handling these APIs, triggers a client action event - which is a message in the client action channel.
 Again, the controller reads these messages from this channel, modifies the canvas and produces the same events as done in 
 joystick events
+
+The download event contains a callback channel, so the controller sends the canvas metrics back to the request
+handler. The request handler waits to this data, and then it generates a PNG image and send it back to 
+the web client.
 
 The software uses the https://github.com/nathany/bobblehat packages in order to perform the HAT hardware related
 functionality.

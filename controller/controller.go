@@ -35,6 +35,8 @@ func NewController(width, height uint8, mailbox *notifier.Notifier) *Controller 
 
 	if "arm" == runtime.GOARCH {
 		c.theHat = hat.NewHat(hatEvents, screenEvents)
+	} else {
+		hat.NewHatMock(hatEvents, screenEvents)
 	}
 
 	return c
@@ -86,6 +88,8 @@ func (c *Controller) do() {
 				changed = true
 			case datatype.EventClientRegistered:
 				c.registered(event.Data.(int64))
+			case datatype.EventTypeDownloadRequest:
+				c.getImagePixels(event.Data.(chan [][]datatype.Color))
 			}
 		}
 		if changed {
@@ -118,5 +122,15 @@ func (c *Controller) registered(id int64) {
 	} else {
 		c.mailbox.NotifyOne(id, js)
 	}
+}
 
+func (c *Controller) getImagePixels(ch chan<- [][]datatype.Color) {
+	pixels := make([][]datatype.Color, len(c.board.Canvas))
+	for i, line := range c.board.Canvas {
+		pixels[i] = make([]datatype.Color, len(line))
+		copy(pixels[i], line)
+	}
+
+	ch <- pixels
+	close(ch)
 }

@@ -30,6 +30,9 @@
 
         div#control {
             margin-top: 1em;
+            border: 1px solid white;
+            padding: 1em;
+            width: fit-content;
         }
 
         h1 {
@@ -51,13 +54,32 @@
     </table>
     <div id="control">
         <p>
+            <label for="colorPicker">Change Color</label> <input type="color" id="colorPicker" value="#ffffff"/>
+        </p>
+        <p>
             <button id="reset" value="Reset">Reset</button>
         </p>
         <p>
             <button id="pickColor" value="Reset" about="set the cursor color to the color of the current pixel">Pick Color From Pixel</button>
         </p>
         <p>
-            <label for="colorPicker">Change Color</label> <input type="color" id="colorPicker" value="#ffffff"/>
+            <form method="get" action="http://{{.Host}}:{{.Port}}/api/canvas/download">
+            <p>Download as a png image:</p>
+                <p>
+                    <select id="pixelSize" name="pixelSize">
+                        <option>1</option>
+                        <option>2</option>
+                        <option selected="selected">3</option>
+                        <option>5</option>
+                        <option>10</option>
+                        <option>20</option>
+                    </select>
+                    <label for="pixelSize">Image square size (in pixels)</label>
+                </p>
+                <p>
+                    <button id="download" value="Download">Download</button>
+                </p>
+        </form>
         </p>
     </div>
 </div>

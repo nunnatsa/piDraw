@@ -39,6 +39,7 @@ const (
 	EventTypeReset ClientEventType = iota
 	EventTypeColorChange
 	EventClientRegistered
+	EventTypeDownloadRequest
 )
 
 type ClientEvent struct {

@@ -6,10 +6,13 @@ This software should run on a raspberry pi with a hat. It uses the hat to draw: 
 The software also starts a web application that serves an HTML page to display the full draw. The cell with the `X` is the cursor location.
 
 The web display also include the following controls:
+- Color picked - to change the color of the cursor: pressing the joystick will set the pixel to this color.
 - The `Reset` button: clear the draw, set the cursor and the window to their default position and the color to the default color.
-- `Pick Colo From Pixel` - change the color to the color of the color of the cell that the cursor is pointing to.
-- Color picked - to change the color of the cursor: pressing the joystick will set the pixel to this color. 
-
+- `Pick Color From Pixel` - change the color to the color of the color of the cell that the cursor is pointing to.
+- Download Image:
+  - Select the download image "pixel" (square) size in real pixels. Choose between 1, 2, 3 (default), 5, 10 or 20 (original size) pixels.
+  - `Download` button to download the image file.
+    
 ###### The HAT during drawing. It only display part of the full picture:
 ![Sense HAT](images/pi-hat.jpeg)
 

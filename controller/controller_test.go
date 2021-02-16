@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/nunnatsa/piDraw/datatype"
+	"github.com/nunnatsa/piDraw/hat"
 	"github.com/nunnatsa/piDraw/notifier"
 	"testing"
 )
@@ -11,10 +12,12 @@ const (
 )
 
 func TestDo(t *testing.T) {
-	c := NewController(3, 3, notifier.NewNotifier())
+	myHat := hat.NewMock()
+	defer myHat.Close()
+	c := NewController(3, 3, notifier.NewNotifier(), myHat)
 
 	c.Start()
-	msg := <-c.screenEvents
+	msg := myHat.GetLastMsg()
 	if msg.CursorY != windowSize/2 {
 		t.Errorf("msg.CursorY should be %d but it's %d", windowSize/2, msg.CursorY)
 	}
@@ -22,8 +25,8 @@ func TestDo(t *testing.T) {
 		t.Errorf("c.boardCursor.Y should be %d but it's %d", windowSize+windowSize/2, c.board.Cursor.Y)
 	}
 
-	c.hatEvents <- datatype.MoveDown
-	msg = <-c.screenEvents
+	myHat.GoDown()
+	msg = myHat.GetLastMsg()
 	if msg.CursorY != 5 {
 		t.Errorf("msg.CursorY should be 5 but it's %d", msg.CursorY)
 	}
@@ -31,8 +34,8 @@ func TestDo(t *testing.T) {
 		t.Errorf("c.boardCursor.Y should be %d but it's %d", windowSize+5, c.board.Cursor.Y)
 	}
 
-	c.hatEvents <- datatype.MoveUp
-	msg = <-c.screenEvents
+	myHat.GoUp()
+	msg = myHat.GetLastMsg()
 	if msg.CursorY != 4 {
 		t.Errorf("msg.CursorY should be 4 but it's %d", msg.CursorY)
 	}
@@ -40,8 +43,8 @@ func TestDo(t *testing.T) {
 		t.Errorf("c.boardCursor.Y should be %d but it's %d", windowSize+4, c.board.Cursor.Y)
 	}
 
-	c.hatEvents <- datatype.MoveRight
-	msg = <-c.screenEvents
+	myHat.GoRight()
+	msg = myHat.GetLastMsg()
 	if msg.CursorX != 5 {
 		t.Errorf("msg.CursorX should be 5 but it's %d", msg.CursorX)
 	}
@@ -49,8 +52,8 @@ func TestDo(t *testing.T) {
 		t.Errorf("c.boardCursor.X should be %d but it's %d", windowSize+5, c.board.Cursor.X)
 	}
 
-	c.hatEvents <- datatype.MoveLeft
-	msg = <-c.screenEvents
+	myHat.GoLeft()
+	msg = myHat.GetLastMsg()
 	if msg.CursorX != 4 {
 		t.Errorf("msg.CursorX should be 4 but it's %d", msg.CursorX)
 	}
@@ -63,8 +66,8 @@ func TestDo(t *testing.T) {
 		t.Errorf("Canvas[%d][%d] should be 0 but it's %d", windowSize+4, windowSize+4, c.board.Canvas[windowSize+4][windowSize+4])
 	}
 	c.board.Cursor.Color = 123456
-	c.hatEvents <- datatype.Pressed
-	msg = <-c.screenEvents
+	myHat.Press()
+	msg = myHat.GetLastMsg()
 	if msg.CursorX != 4 {
 		t.Errorf("msg.CursorX should be 4 but it's %d", msg.CursorX)
 	}
@@ -90,7 +93,7 @@ func TestDo(t *testing.T) {
 	}
 
 	c.clientEvents <- datatype.ClientEvent{EventType: datatype.EventTypeReset}
-	msg = <-c.screenEvents
+	msg = myHat.GetLastMsg()
 	if msg.CursorX != 4 {
 		t.Errorf("msg.CursorX should be 4 but it's %d", msg.CursorX)
 	}

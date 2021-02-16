@@ -19,7 +19,13 @@
 
         table {
             border-collapse: collapse;
+            padding: 0;
+            margin: 0
+        }
+
+        div#table_wrapper {
             margin: auto;
+            padding: 0;
         }
 
         div#main {
@@ -33,6 +39,8 @@
             border: 1px solid white;
             padding: 1em;
             width: fit-content;
+            float: left;
+            margin-right: 1em;
         }
 
         h1 {
@@ -50,8 +58,6 @@
     
 <div id="main">
     <h1>Pi Sense HAT Draw</h1>
-    <table id="matrix">
-    </table>
     <div id="control">
         <p>
             <label for="colorPicker">Change Color</label> <input type="color" id="colorPicker" value="#ffffff"/>
@@ -63,24 +69,27 @@
             <button id="pickColor" value="Reset" about="set the cursor color to the color of the current pixel">Pick Color From Pixel</button>
         </p>
         <p>
-            <form method="get" action="http://{{.Host}}:{{.Port}}/api/canvas/download">
+        <form method="get" action="http://{{.Host}}:{{.Port}}/api/canvas/download">
             <p>Download as a png image:</p>
-                <p>
-                    <select id="pixelSize" name="pixelSize">
-                        <option>1</option>
-                        <option>2</option>
-                        <option selected="selected">3</option>
-                        <option>5</option>
-                        <option>10</option>
-                        <option>20</option>
-                    </select>
-                    <label for="pixelSize">Image square size (in pixels)</label>
-                </p>
-                <p>
-                    <button id="download" value="Download">Download</button>
-                </p>
+            <p>
+                <select id="pixelSize" name="pixelSize">
+                    <option>1</option>
+                    <option>2</option>
+                    <option selected="selected">3</option>
+                    <option>5</option>
+                    <option>10</option>
+                    <option>20</option>
+                </select>
+                <label for="pixelSize">Image square size (in pixels)</label>
+            </p>
+            <p>
+                <button id="download" value="Download">Download</button>
+            </p>
         </form>
-        </p>
+    </div>
+    <div id="table_wrapper">
+        <table id="matrix">
+        </table>
     </div>
 </div>
 
@@ -135,7 +144,7 @@
         cursorID = getCelId(data.cursor.x, data.cursor.y)
         const cursorElement = document.getElementById(cursorID)
         cursorElement.style.color = reverseColor(cursorElement.style.backgroundColor)
-        cursorElement.innerText = 'X'
+        cursorElement.innerText = 'x'
 
         colorPicker.value = `#${data.cursor.color.toString(16).padStart(6, '0')}`
     };

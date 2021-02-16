@@ -32,20 +32,24 @@ func toHatColor(c datatype.Color) color.Color {
 	return r | g | b
 }
 
+type HATInterface interface {
+	SetChannels(e chan<- datatype.HatEvent, s <-chan *datatype.DisplayMessage)
+	Start()
+}
+
 type Hat struct {
 	events chan<- datatype.HatEvent
 	screen <-chan *datatype.DisplayMessage
 	input  *stick.Device
 }
 
-func NewHat(e chan<- datatype.HatEvent, s <-chan *datatype.DisplayMessage) *Hat {
-	h := &Hat{
-		events: e,
-		screen: s,
-	}
+func (h *Hat) SetChannels(e chan<- datatype.HatEvent, s <-chan *datatype.DisplayMessage) {
+	h.events = e
+	h.screen = s
+}
 
+func (h *Hat) Start() {
 	go h.do()
-	return h
 }
 
 func (h *Hat) init() {

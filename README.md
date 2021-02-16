@@ -72,4 +72,7 @@ The software support 3 optional parameters:
 
 ### Running not from Raspberry Pi
 It is also possible to run from a PC (only tested on Linux). Instead of the joystick, use the arrow keys to move the 
-cursor and `Enter` key to paint the pixel. 
+cursor and `Enter` key to paint the pixel.
+
+## The Software
+See [here](docs/ARCHITECTURE.md).

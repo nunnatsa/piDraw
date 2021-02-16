@@ -3,10 +3,10 @@
 class datatype.Color{}
 
 class canvas.Canvas {
-datatype.Color[][]
-Set(cr *Cursor)
-Delete(cr *Cursor)
-Reset()
+- datatype.Color[][]
++ Set(cr *Cursor)
++ Delete(cr *Cursor)
++ Reset()
 }
 
 canvas.Board "1" o-- "1" canvas.Canvas
@@ -16,46 +16,49 @@ canvas.Canvas o-- datatype.Color
 canvas.Window o-- datatype.Color
 
 class canvas.Cursor {
-x uint8
-y uint8
-MoveUp()
-MoveDown()
-MoveLeft()
-MoveRight()
-SetColor(datatype.Color)
-GetColor() datatype.Color
+- x : uint8
+- y : uint8
++ MoveUp()
++ MoveDown()
++ MoveLeft()
++ MoveRight()
++ SetColor(datatype.Color)
++ GetColor() datatype.Color
 }
 
 class canvas.Board {
-Canvas canvas.Canvas
-Cursor canvas.Cursor
-Window canvas.Window
-MoveUp()
-MoveDown()
-MoveLeft()
-MoveRight()
-DrawPixel()
-DeletePixel()
-Reset()
++ Canvas : canvas.Canvas
++ Cursor : canvas.Cursor
++ Window : canvas.Window
++ MoveUp()
++ MoveDown()
++ MoveLeft()
++ MoveRight()
++ DrawPixel()
++ DeletePixel()
++ Reset()
 }
 
 class canvas.Window {
-x uint8
-y uint8
-Matrix [][]datatype.Color
+- x : uint8
+- y : uint8
++ Matrix [][]datatype.Color
 }
 
 notifier.Notifier "1" o-- "1" notifier.idProvider
 
 class notifier.idProvider {
+- lock : *sync.Mutex
+- counter : int64
++ getNextID()
 }
 class notifier.Notifier {
-clientMap map[int64]chan []byte
-idp notifier.idProvider
-Subscribe(ch chan []byte) int64
-Unsubscribe(id int64)
-Notify(data []byte)
-NotifyOne(id int64, data []byte)
+- clientMap : map[int64]chan []byte
+- idp : notifier.idProvider
++ Subscribe(ch chan []byte) : int64
++ Unsubscribe(id int64)
++ Notify(data []byte)
++ NotifyOne(id int64, data []byte)
 }
 
 interface http.Handler
@@ -66,27 +69,48 @@ webapp.ClientActions "1" o-- "1" http.ServeMux
 webapp.ClientActions "1" o-- "1" notifier.Notifier
 
 class webapp.index {
-ServeHTTP(w,r)
++ ServeHTTP(w,r)
 }
 class webapp.ClientActions {
-	mux     *http.ServeMux
-	mailbox *notifier.Notifier
-	ch      chan<- datatype.ClientEvent
-	GetMux() *http.ServeMux
+- mux : *http.ServeMux
+- mailbox : *notifier.Notifier
+- ch : chan<- datatype.ClientEvent
++ GetMux() : *http.ServeMux
 }
 
 controller.Controller "1" o-- "1" notifier.Notifier
-controller.Controller "1" o-- "1" hat.Hat
+controller.Controller "1" o-- "1" hat.HATInterface
 controller.Controller "1" o-- "1" canvas.Board
 
 class controller.Controller {
-	board        *canvas.Board
-	theHat       *hat.Hat
-	hatEvents    chan datatype.HatEvent
-	screenEvents chan *datatype.DisplayMessage
-	clientEvents chan datatype.ClientEvent
-	mailbox      *notifier.Notifier
-	Start()
+- board        : *canvas.Board
+- theHat       : *hat.Hat
+- hatEvents    : chan datatype.HatEvent
+- screenEvents : chan *datatype.DisplayMessage
+- clientEvents : chan datatype.ClientEvent
+- mailbox      : *notifier.Notifier
++ Start()
 }
+
+interface hat.HATInterface {
++ SetChannels()
++ Start()
+}
+
+class hat.Hat {
+- hatEvents    : chan datatype.HatEvent
+- screenEvents : chan datatype.DisplayMessage
++ SetChannels()
++ Start()
+}
+
+class hat.HatMock {
+- hatEvents    : chan datatype.HatEvent
+- screenEvents : chan datatype.DisplayMessage
++ SetChannels()
++ Start()
+}
+hat.HATInterface <|- hat.Hat
+hat.HATInterface <|- hat.HatMock
 
 @enduml

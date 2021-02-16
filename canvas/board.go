@@ -11,11 +11,11 @@ var (
 
 // Board is the draing board.
 type Board struct {
-	Canvas       Canvas  `json:"canvas,omitempty"`
-	Cursor       *Cursor `json:"cursor,omitempty"`
-	Window       *Window `json:"window,omitempty"`
-	centerX      uint8
-	centerY      uint8
+	Canvas  Canvas  `json:"canvas,omitempty"`
+	Cursor  *Cursor `json:"cursor,omitempty"`
+	Window  *Window `json:"window,omitempty"`
+	centerX uint8
+	centerY uint8
 }
 
 // NewBoard initiate a new Board

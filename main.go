@@ -4,10 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"github.com/nunnatsa/piDraw/controller"
+	"github.com/nunnatsa/piDraw/hat"
 	"github.com/nunnatsa/piDraw/notifier"
 	"github.com/nunnatsa/piDraw/webapp"
 	"log"
 	"net/http"
+	"runtime"
 )
 
 var (
@@ -36,7 +38,14 @@ func init() {
 
 func main() {
 	mailbox := notifier.NewNotifier()
-	control := controller.NewController(uint8(width), uint8(height), mailbox)
+	var theHat hat.HATInterface
+	if "arm" == runtime.GOARCH {
+		theHat = &hat.Hat{}
+	} else {
+		theHat = hat.NewMock()
+	}
+
+	control := controller.NewController(uint8(width), uint8(height), mailbox, theHat)
 	ca := webapp.NewClientAction(mailbox, uint16(port), control.GetClientEvents())
 	mux := ca.GetMux()
 	control.Start()

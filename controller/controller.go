@@ -7,19 +7,21 @@ import (
 	"github.com/nunnatsa/piDraw/hat"
 	"github.com/nunnatsa/piDraw/notifier"
 	"log"
-	"runtime"
+)
+
+var (
+	theHat hat.HATInterface
 )
 
 type Controller struct {
 	board        *canvas.Board
-	theHat       *hat.Hat
 	hatEvents    chan datatype.HatEvent
 	screenEvents chan *datatype.DisplayMessage
 	clientEvents chan datatype.ClientEvent
 	mailbox      *notifier.Notifier
 }
 
-func NewController(width, height uint8, mailbox *notifier.Notifier) *Controller {
+func NewController(width, height uint8, mailbox *notifier.Notifier, myHat hat.HATInterface) *Controller {
 	hatEvents := make(chan datatype.HatEvent)
 	screenEvents := make(chan *datatype.DisplayMessage)
 	clientEvents := make(chan datatype.ClientEvent)
@@ -33,11 +35,8 @@ func NewController(width, height uint8, mailbox *notifier.Notifier) *Controller 
 		mailbox:      mailbox,
 	}
 
-	if "arm" == runtime.GOARCH {
-		c.theHat = hat.NewHat(hatEvents, screenEvents)
-	} else {
-		hat.NewHatMock(hatEvents, screenEvents)
-	}
+	myHat.SetChannels(hatEvents, screenEvents)
+	myHat.Start()
 
 	return c
 }

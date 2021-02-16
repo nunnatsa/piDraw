@@ -178,9 +178,9 @@ func createPng(w http.ResponseWriter, pixels [][]datatype.Color, pixelSize int) 
 }
 
 func setPixel(img *image.RGBA, x int, y int, pixel datatype.Color, pixelSize int) {
-	x = x*pixelSize
-	y = y*pixelSize
-	for x1 := x; x1 < x + pixelSize; x1++ {
+	x = x * pixelSize
+	y = y * pixelSize
+	for x1 := x; x1 < x+pixelSize; x1++ {
 		for y1 := y; y1 < y+pixelSize; y1++ {
 			img.Set(x1, y1, colorToImageColor(pixel))
 		}

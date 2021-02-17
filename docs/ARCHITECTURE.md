@@ -1,10 +1,10 @@
 # Software Architecture
 ## General Description
 The architecture of this software is using the event-driven approach, in order to be able to support multiple displays 
-with from multiple types. There is a complete seperation between the event generators, event consumers and the software 
+with multiple types. There is a complete seperation between the event generators, event consumers and the software 
 state. 
 
-The HAT joystick produces 5 type of events (Move up, down, left or right, and pressing). The HAT sends these events to a
+The HAT joystick produces 5 types of events (Move up, down, left or right, and pressing). The HAT sends these events to a
 dedicated channel. The HAT display is listening to another channel, with a display events. These events contain the required 
 matrix to be displayed, and the relative location of the cursor.
 
